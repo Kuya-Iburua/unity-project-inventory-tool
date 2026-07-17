@@ -48,10 +48,10 @@ function doPost(e) {
       safeCell(item.category), safeCell(item.name), safeCell(item.packageId), safeCell(item.version),
       safeCell(item.requestedVersion), safeCell(item.source), safeCell(item.path), safeCell(item.status),
       safeCell(item.directDependency), safeCell(item.dependencies), safeCell(item.authorName),
-      safeHttpUrl(item.verifiedUrl) ? 'Open' : '', safeCell(item.verifiedUrlType), safeCell(item.linkConfidence),
-      safeHttpUrl(item.documentationUrl) ? 'Docs' : '', safeHttpUrl(item.repositoryUrl) ? 'Repo' : '',
-      safeHttpUrl(item.homepageUrl) ? 'Home' : '', safeHttpUrl(item.authorUrl) ? 'Author' : '',
-      safeHttpUrl(item.changelogUrl) ? 'Changes' : '', safeHttpUrl(item.licensesUrl) ? 'License' : '',
+      safeHttpUrl(item.verifiedUrl) ? linkLabel(item.verifiedUrl, 'Open') : '', safeCell(item.verifiedUrlType), safeCell(item.linkConfidence),
+      safeHttpUrl(item.documentationUrl) ? linkLabel(item.documentationUrl, 'Docs') : '', safeHttpUrl(item.repositoryUrl) ? linkLabel(item.repositoryUrl, 'Repo') : '',
+      safeHttpUrl(item.homepageUrl) ? linkLabel(item.homepageUrl, 'Home') : '', safeHttpUrl(item.authorUrl) ? linkLabel(item.authorUrl, 'Author') : '',
+      safeHttpUrl(item.changelogUrl) ? linkLabel(item.changelogUrl, 'Changes') : '', safeHttpUrl(item.licensesUrl) ? linkLabel(item.licensesUrl, 'License') : '',
       'Google | GitHub | BOOTH', numberCell(item.fileCount), numberCell(item.scriptCount),
       numberCell(item.editorScriptCount), numberCell(item.prefabCount), numberCell(item.materialCount),
       numberCell(item.shaderCount), numberCell(item.textureCount), numberCell(item.pluginCount),
@@ -65,13 +65,13 @@ function doPost(e) {
     sheet.getRange(1, 1, values.length, headers.length).createFilter();
 
     if (rows.length > 0) {
-      setLinkColumn(sheet, items, 12, 'Open', item => item.verifiedUrl);
-      setLinkColumn(sheet, items, 15, 'Docs', item => item.documentationUrl);
-      setLinkColumn(sheet, items, 16, 'Repo', item => item.repositoryUrl);
-      setLinkColumn(sheet, items, 17, 'Home', item => item.homepageUrl);
-      setLinkColumn(sheet, items, 18, 'Author', item => item.authorUrl);
-      setLinkColumn(sheet, items, 19, 'Changes', item => item.changelogUrl);
-      setLinkColumn(sheet, items, 20, 'License', item => item.licensesUrl);
+      setLinkColumn(sheet, items, 12, item => linkLabel(item.verifiedUrl, 'Open'), item => item.verifiedUrl);
+      setLinkColumn(sheet, items, 15, item => linkLabel(item.documentationUrl, 'Docs'), item => item.documentationUrl);
+      setLinkColumn(sheet, items, 16, item => linkLabel(item.repositoryUrl, 'Repo'), item => item.repositoryUrl);
+      setLinkColumn(sheet, items, 17, item => linkLabel(item.homepageUrl, 'Home'), item => item.homepageUrl);
+      setLinkColumn(sheet, items, 18, item => linkLabel(item.authorUrl, 'Author'), item => item.authorUrl);
+      setLinkColumn(sheet, items, 19, item => linkLabel(item.changelogUrl, 'Changes'), item => item.changelogUrl);
+      setLinkColumn(sheet, items, 20, item => linkLabel(item.licensesUrl, 'License'), item => item.licensesUrl);
 
       const searchLinks = items.map(item => [makeSearchLinks(item)]);
       sheet.getRange(2, 21, rows.length, 1).setRichTextValues(searchLinks);
@@ -91,6 +91,7 @@ function doPost(e) {
       `Unity: ${payload.unityVersion || ''}\n` +
       `Project path: ${payload.projectPath || ''}\n\n` +
       'Link policy: Preferred/direct links come only from installed package metadata or a deterministic Unity documentation URL. ' +
+      'Package metadata is not independently verified; inspect the displayed domain before opening. ' +
       'Search links are manual lookup shortcuts and are never treated as verified official pages.'
     );
 
@@ -116,8 +117,8 @@ function doPost(e) {
   }
 }
 
-function setLinkColumn(sheet, items, column, label, selector) {
-  const values = items.map(item => [makeSingleLink(label, selector(item))]);
+function setLinkColumn(sheet, items, column, labelSelector, urlSelector) {
+  const values = items.map(item => [makeSingleLink(labelSelector(item), urlSelector(item))]);
   sheet.getRange(2, column, values.length, 1).setRichTextValues(values);
 }
 
@@ -132,6 +133,18 @@ function makeSingleLink(label, value) {
     .setText(label)
     .setLinkUrl(url)
     .build();
+}
+
+function linkLabel(value, fallback) {
+  const url = safeHttpUrl(value);
+  if (!url) return '';
+
+  try {
+    const host = new URL(url).hostname.replace(/^www\./i, '');
+    return host || fallback;
+  } catch (_) {
+    return fallback;
+  }
 }
 
 function makeSearchLinks(item) {
@@ -190,7 +203,7 @@ function makeSheetName(projectName) {
 function safeCell(value) {
   if (value === null || value === undefined) return '';
   const text = String(value);
-  return /^[=+\-@]/.test(text) ? `'${text}` : text;
+  return /^[\s]*[=+\-@]/.test(text) ? `'${text}` : text;
 }
 
 function numberCell(value) {

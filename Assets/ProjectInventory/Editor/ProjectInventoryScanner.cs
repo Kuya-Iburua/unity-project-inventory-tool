@@ -523,25 +523,25 @@ namespace Kuya.ProjectInventory
             {
                 item.verifiedUrl = item.documentationUrl;
                 item.verifiedUrlType = "Documentation metadata";
-                item.linkConfidence = "High - installed package metadata";
+                item.linkConfidence = "Metadata source - not independently verified";
             }
             else if (!string.IsNullOrEmpty(item.repositoryUrl))
             {
                 item.verifiedUrl = item.repositoryUrl;
                 item.verifiedUrlType = "Repository metadata";
-                item.linkConfidence = "High - installed package metadata";
+                item.linkConfidence = "Metadata source - not independently verified";
             }
             else if (!string.IsNullOrEmpty(item.homepageUrl))
             {
                 item.verifiedUrl = item.homepageUrl;
                 item.verifiedUrlType = "Homepage metadata";
-                item.linkConfidence = "High - installed package metadata";
+                item.linkConfidence = "Metadata source - not independently verified";
             }
             else if (IsUnityOfficialPackage(item))
             {
                 item.verifiedUrl = BuildUnityDocumentationUrl(item.packageId, item.version);
                 item.verifiedUrlType = "Unity official documentation pattern";
-                item.linkConfidence = "Medium - official domain, page availability not verified";
+                item.linkConfidence = "Unity docs pattern - page availability not verified";
             }
             else
             {

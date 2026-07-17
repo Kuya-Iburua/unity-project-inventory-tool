@@ -14,3 +14,9 @@ Initial public release.
 - Google Sheets upload through Apps Script
 - Package metadata URL extraction
 - Safe manual search links
+
+### Safety notes
+
+- Package metadata links are labeled as metadata sources rather than independently verified URLs
+- Google Sheets displays the destination domain for direct links
+- Spreadsheet formula injection protection is applied to exported text cells

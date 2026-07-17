@@ -12,7 +12,7 @@ namespace Kuya.ProjectInventory
         private static readonly string[] Headers =
         {
             "Category", "Name", "Package ID", "Installed Version", "Requested Version", "Source", "Path",
-            "Status", "Direct Dependency", "Dependencies", "Author", "Verified URL", "URL Basis", "Link Confidence",
+            "Status", "Direct Dependency", "Dependencies", "Author", "Preferred URL", "URL Basis", "Link Confidence",
             "Documentation URL", "Repository URL", "Homepage URL", "Author URL", "Changelog URL", "License URL",
             "Search Query", "Files", "Scripts", "Editor Scripts", "Prefabs", "Materials", "Shaders", "Textures",
             "Plugins", "Size Bytes", "Assembly Definitions", "Editor Menus", "Notes"
